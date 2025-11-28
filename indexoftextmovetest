@@ -1,0 +1,58 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<style> /*ここにcssの内容を書く　これだけでは動かない見た目だけの操作　座標を持たせる */
+ .draggable{   /*cssのクラスdraggableクラス（draggableというラベルをつける） ドラッグを可能にする*/
+ position: absolute;  /* 座標(top,left)で配置できるようにする */
+ cursor: move; /*　マウスを要素上に合わせると十字カーソルになる*/
+ padding: 4px; /*内側の余白*/
+ background: rgba(255,255,255,0.7); /*背景色　(r,g,b,a透過率) */
+ border: 1px solid #ccc; /*要素の境界線*/
+ }
+</style>
+</head>
+
+<body>
+
+<div id="text1" class="draggable" style="top:50px; left: 50px;">  <!--draggableクラスを適用　styleに初期座標  -->
+　移動
+</div>
+
+<div id = "text2" class = "draggable" style="top: 120px; left: 120px;">
+    move
+</div>
+
+<script>
+function makeDraggable(element){//javascriptセクション　引数elementに与えたdom要素をドラッグ可能にする　draggableラベルを持つ要素を全部取得
+	let offsetX = 0;//要素を掴んだx軸を保持
+	let offsetY = 0;//要素を掴んだy軸を保持
+	let isDown = false;//要素を掴んでいるかどうかの真偽
+	
+	element.addEventListener('mousedown', function(e){<!--マウスで掴む　座標の基準点を取得-->
+		isDown = true;
+		offsetX = e.clientX - parseInt(element.style.left);
+		offsetY = e.clientY - parseInt(element.style.top);
+	}); 
+	
+	document.addEventListener('mouseup', function(){<!--マウスから離す-->
+		isDown = false;
+	});
+	
+	document.addEventListener('mousemove', function(e){<!--マウスを動かし座標を更新-->
+		if(isDown){
+			element.style.left = (e.clientX - offsetX) + 'px';
+			element.style.top = (e.clientY - offsetY) + 'px';
+		}
+	});
+}
+document.querySelectorAll('.draggable').forEach(makeDraggable);//foreachで取得した全ての要素にmakedraggableを適応
+</script>
+
+
+</body>
+</html>
