@@ -1,0 +1,58 @@
+package controller;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+@WebServlet("/SavePosition")
+public class SavePositionController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+    @Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException {
+		
+    	BufferedReader reader = null;
+    	StringBuilder sb = new StringBuilder();
+    	try(//JSON文字列の読み取り
+    			reader=request.getReader();
+    			String line;
+    			while((line = reader.readLine()) != null) {
+    				sb.append(line);
+    			}
+    			//json文字列をjsonオブジェクトに変換
+    			JSONObject json = new JSONObject(sb.toString());
+    			//jsonから値を取得
+    			String elementId = json.getString("elementId");
+    			int x = json.getInt("x");
+    			int y = json.getInt("y");
+    			
+    			//DAOからdbに保存
+    			WordDAO dao = new WordDAO();
+    			dao.updatePosition(elementId,x,y);
+    			
+
+            // レスポンスを返す
+            response.setContentType("application/json");
+            response.getWriter().write("{\"status\":\"ok\"}");
+
+        } catch (Exception e) {
+            e.printStackTrace(); // エラーをコンソールに表示
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("{\"status\":\"error\"}");
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close(); // 必ず閉じる
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }A
+}
