@@ -42,17 +42,19 @@
 
 <script>
 
-document.querySelectorAll('.word').forEach(el => {
-    let isDragging = false;
+document.querySelectorAll('.word').forEach(el => {//forEach　wordクラスを指定した要素を一つずつelに代入　＝＞はfunction(el) functionは関数を作る
+    let isDragging = false; //letは宣言するときに書く javascriptは型の指定はなし
 	
-	el.onmousedown = function(e){
-		let offsetX = e.clientX - el.offsetLeft;
-		let offsetY = e.clientY - el.offsetTop;
+    //要素をクリックした時に発生させるのでel.
+	el.onmousedown = function(e){ //マウスを押した時の関数を作成　eにはイベント情報(mouseevent)が入る　mousedownはドラッグ開始の合図になるため、この関数の{}内にupやmoveも書く
+    	//つまりこのイベント発生後、同イベント内で動かす処理と終了する処理を有効にする必要がある
+		let offsetX = e.clientX - el.offsetLeft;//e.clientXはマウスのx座標　el.offsetLeftは要素の左位置
+		let offsetY = e.clientY - el.offsetTop;//つまりクリックした位置からの差　対象をつまんだ位置
 		isDragging = false;
 		
-		document.onmousemove = function(e){
+		document.onmousemove = function(e){//要素の外で発生させるのでdocument.
 			isDragging = true;
-			el.style.left = (e.clientX - offsetX) + "px";
+			el.style.left = (e.clientX - offsetX) + "px";//要素のcssのleftを右オペラントにする。右は移動中の左端の座標位置
 			el.style.top = (e.clientY - offsetY) + "px";
 		};
 		
@@ -60,20 +62,20 @@ document.querySelectorAll('.word').forEach(el => {
 			document.onmousemove = null;
 			document.onmouseup = null;
 
-			if(!isDragging){
-				const link = el.querySelector("a");
-				if(link) link.click();
+			if(!isDragging){//ドラッグされなければ、つまりクリックされれば
+				const link = el.querySelector("a");//再代入不可の変数宣言const 要素の<a>タグを取得
+				if(link) link.click();//linkの中身があればclick()つまりaタグのリンク先に遷移する　ドラッグされればクリック扱いにならない
 			}else{
-				savePos(el.dataset.id, el.style.left, el.style.top);
+				savePos(el.dataset.id, el.style.left, el.style.top);//ドラッグされれば位置を保存
 			}
 		};
 	};
 });
 function savePos(wordId, x, y){
-	fetch("updatePosition", {
+	fetch("updatePosition", {//fetchでservletにリクエストを送る　@/updatePosition
 		method: "POST",
-		headers:{"Content-Type": "application/x-www-form-urlencoded"},
-		body: "word_id=" + wordId + "&x=" + parseInt(x) + "&y=" + parseInt(y)
+		headers:{"Content-Type": "application/x-www-form-urlencoded"},//Content-Type　送るデータの形式　postのbodyはurlエンコード形式という意味
+		body: "word_id=" + wordId + "&x=" + parseInt(x) + "&y=" + parseInt(y)//pxなどの無駄な文字を消して送るためにparseIntする数字だけの文字列としてservletはキャッチする
 	});
 }
 
